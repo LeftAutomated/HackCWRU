@@ -1,10 +1,13 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import requests
 import os
 import random
 from dotenv import load_dotenv
 from jokeapi import Jokes
+from datetime import datetime, timedelta
+import asyncio
+
 
 load_dotenv()
 
@@ -71,7 +74,6 @@ async def joke_command(ctx):
     else:
         joke_message += joke["setup"]
         joke_message += joke["delivery"]
-
     await ctx.send(joke_message)
 
 @client.command('meme')
@@ -82,5 +84,26 @@ async def command_meme(ctx):
     image_url = r["url"]
     await ctx.send(image_url)
 
+@tasks.loop(seconds=10)
+async def command_quote():
+    channel = client.get_channel(954837807187247255)
+    r = requests.get("https://zenquotes.io/api/random").json()
+    quote = r[0]["q"]
+    author = r[0]["a"]
+    await channel.send(quote + "\n --" + author)
 
+@command_quote.before_loop
+async def before():
+    now = datetime.now()
+    target = datetime(*now.timetuple()[0:3], hour=16, minute=11)
+
+    if target < now:  # if the target is before now, add one day
+        target += datetime.timedelta(days=1)
+
+    diff = target - now
+    await asyncio.sleep(diff.seconds)
+    await client.wait_until_ready()
+    print("Finished waiting")
+
+command_quote.start()
 client.run(token)
