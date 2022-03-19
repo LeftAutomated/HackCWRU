@@ -28,7 +28,10 @@ async def on_ready():
 async def on_message(message):
     await client.process_commands(message)
 
-<<<<<<< HEAD
+@client.event
+async def on_member_join(member):
+    await member.send("Hello there! I'm SenPy. I'm your potential guide to happiness and a savior from sadness. If you'd like me to monitor your happiness levels, reply with a 'Yes'. Otherwise, reply with a 'No'.")
+
 
 ###################
 # therapy command #
@@ -46,12 +49,6 @@ async def therapy_command(ctx):
 
     # todo
     # recommend nearby therapy locations
-
-=======
-@client.event
-async def on_member_join(member):
-    await member.send("Hello there! I'm SenPy. I'm your potential guide to happiness and a savior from sadness. If you'd like me to monitor your happiness levels, reply with a 'Yes'. Otherwise, reply with a 'No'.")
->>>>>>> 346af332fb86f676ccde16956a88b1b0f66a07c2
 
 #################
 # quote command #
