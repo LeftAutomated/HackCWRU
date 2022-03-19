@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import requests
 import os
+import random
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,5 +34,13 @@ async def yodad(ctx):
     dadjoke = dadjoke.replace("her", "his")
     dadjoke = dadjoke.replace("she", "he")
     await ctx.send(dadjoke)
+
+@client.command()
+async def quote(ctx):
+    response = requests.get("https://type.fit/api/quotes")
+    quote_arr = response.json()
+    rand = random.randint(0, len(quote_arr))
+    quote = quote_arr[rand]['text'] + " \n- " + quote_arr[rand]['author']
+    await ctx.send(quote)
 
 client.run(token)
