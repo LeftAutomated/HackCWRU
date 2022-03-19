@@ -43,4 +43,18 @@ async def quote(ctx):
     quote = quote_arr[rand]['text'] + " \n- " + quote_arr[rand]['author']
     await ctx.send(quote)
 
+# Command invoked with !hotline
+@client.command("hotline")
+async def command_hotlines(ctx):
+    hotlines = [
+        "SAMSHA National Helpline - 1-800-662-4357",
+        "NAMI - 1-800-950-6264",
+        "National Suicide Prevention Hotline - 1-800-273-8255",
+        "Boys Town Hotline - 1-800-448-3000"
+    ]
+    hotline_message = "Here are several mental health hotlines to call: \n\n"
+    for hotline in hotlines:
+        hotline_message += hotline + '\n'
+    await ctx.send(hotline_message)
+
 client.run(token)
