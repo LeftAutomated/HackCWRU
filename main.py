@@ -1,10 +1,13 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import requests
 import os
 import random
 from dotenv import load_dotenv
 from jokeapi import Jokes
+from datetime import datetime, timedelta
+import asyncio
+
 
 load_dotenv()
 
@@ -25,6 +28,7 @@ async def on_ready():
 async def on_message(message):
     await client.process_commands(message)
 
+<<<<<<< HEAD
 
 ###################
 # therapy command #
@@ -43,6 +47,11 @@ async def therapy_command(ctx):
     # todo
     # recommend nearby therapy locations
 
+=======
+@client.event
+async def on_member_join(member):
+    await member.send("Hello there! I'm SenPy. I'm your potential guide to happiness and a savior from sadness. If you'd like me to monitor your happiness levels, reply with a 'Yes'. Otherwise, reply with a 'No'.")
+>>>>>>> 346af332fb86f676ccde16956a88b1b0f66a07c2
 
 #################
 # quote command #
@@ -61,15 +70,15 @@ async def quote_command(ctx):
 # hotlines command #
 ####################
 
-hotline_names = ["SAMSHA National Helpline", 
-                 "NAMI", 
-                 "National Suicide Prevention Hotline", 
+hotline_names = ["SAMSHA National Helpline",
+                 "NAMI",
+                 "National Suicide Prevention Hotline",
                  "Boys Town Hotline"]
-hotline_links = ["https://www.samhsa.gov/find-help/national-helpline", 
-                 "https://www.nami.org/help", 
-                 "https://suicidepreventionlifeline.org/", 
+hotline_links = ["https://www.samhsa.gov/find-help/national-helpline",
+                 "https://www.nami.org/help",
+                 "https://suicidepreventionlifeline.org/",
                  "https://www.boystown.org/hotline/Pages/default.aspx"]
-hotline_numbers = ["1-800-662-4357", 
+hotline_numbers = ["1-800-662-4357",
                    "1-800-950-6264",
                    "1-800-273-8255",
                    "1-800-448-3000"]
@@ -94,6 +103,19 @@ async def hotlines_command(ctx):
 
     await ctx.send(embed=embed)
 
+#################
+# Links command #
+#################
+
+@client.command()
+async def links(ctx):
+  embed_titles = ["Psych Central", "Headspace", "Therapy Tribe", "Calm Sage", "Doxy"]
+  embed_urls = ["https://psychcentral.com/", "https://www.headspace.com/", "https://support.therapytribe.com/", "https://www.calmsage.com/", "https://www.doxy.me/"]
+  embed_descriptions = ["Psych Central is one of the oldest websites about mental health. The award winning website has been around ever since 1995 and has touched the lives of many. As is quite evident from the name the blog keenly focuses on the psych of a person.", "If you are finding it hard to focus on your life-goals all because you are stressed, then you should definitely check Headspace out. It contains hundreds of articles and blogs about mental health.", "Therapy Tribe takes peer-to-peer mental health support to the next level. Apart from a range of resources, it offers dedicated domains or Tribes for many different issues.", "If you like the idea of sharing your personal stories and discovering people with the same experiences, try out Calm Sage. The website is more educational than a place to connect, but it does welcome guest posts about mental health triumphs.", "doxy.me is a free, secure, simple online platform for telemedicine. Telemedicine will change the world by making it easier and more affordable for healthcare providers to care for their patients anywhere, including rural and underserved areas. We believe everyone should have access to care through telemedicine."]
+  embed_colors = [0xFFA500, 0xFFFFFF, 0xBF40BF, 0xFFFF00, 0xADD8E6]
+  for i in range (5):
+    messageLinks = discord.Embed(title=embed_titles[i],url=embed_urls[i],description = embed_descriptions[i], color = embed_colors[i])
+    await ctx.send(embed = messageLinks)
 
 ################
 # joke command #
@@ -109,7 +131,6 @@ async def joke_command(ctx):
     else:
         joke_message += joke["setup"]
         joke_message += joke["delivery"]
-
     await ctx.send(joke_message)
 
 
@@ -125,5 +146,26 @@ async def meme_command(ctx):
     image_url = r["url"]
     await ctx.send(image_url)
 
+@tasks.loop(seconds=10)
+async def command_quote():
+    channel = client.get_channel(954837807187247255)
+    r = requests.get("https://zenquotes.io/api/random").json()
+    quote = r[0]["q"]
+    author = r[0]["a"]
+    await channel.send(quote + "\n --" + author)
 
+@command_quote.before_loop
+async def before():
+    now = datetime.now()
+    target = datetime(*now.timetuple()[0:3], hour=16, minute=11)
+
+    if target < now:  # if the target is before now, add one day
+        target += datetime.timedelta(days=1)
+
+    diff = target - now
+    await asyncio.sleep(diff.seconds)
+    await client.wait_until_ready()
+    print("Finished waiting")
+
+command_quote.start()
 client.run(token)
