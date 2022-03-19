@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import requests
 import os
 import random
@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from jokeapi import Jokes
 import dbms
 import functions
+from datetime import datetime, timedelta
+import asyncio
 
 load_dotenv()
 
@@ -36,6 +38,24 @@ async def on_member_join(member):
     if (msg.content.strip() == "Yes"):
         dbms.userInsert(member.id, 0, 0)
         await member.send("Your messages will now be monitored!")
+
+
+###################
+# therapy command #
+###################
+
+@client.command('therapy')
+async def therapy_command(ctx):
+    location_question = "Well hello there! I can help you seek therapy around your physical location. May I please know your city and state? **Format:**  $location Cleveland, OH" 
+
+    await ctx.author.send(location_question)
+
+    msg = await client.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.author.dm_channel, timeout=60)
+
+    user_location_response = msg.content
+
+    # todo
+    # recommend nearby therapy locations
 
 #################
 # quote command #
@@ -115,7 +135,6 @@ async def joke_command(ctx):
     else:
         joke_message += joke["setup"]
         joke_message += joke["delivery"]
-
     await ctx.send(joke_message)
 
 
@@ -131,6 +150,13 @@ async def meme_command(ctx):
     image_url = r["url"]
     await ctx.send(image_url)
 
+@tasks.loop(seconds=10)
+async def command_quote():
+    channel = client.get_channel(954837807187247255)
+    r = requests.get("https://zenquotes.io/api/random").json()
+    quote = r[0]["q"]
+    author = r[0]["a"]
+    await channel.send(quote + "\n --" + author)
 
 #####################
 # debugging command #
@@ -144,6 +170,22 @@ async def print_command(ctx):
 @client.command('searchUser')
 async def search_command(ctx, discordId):
     await ctx.send(functions.checkUserExist(discordId))
+
+
+@command_quote.before_loop
+async def before():
+    now = datetime.now()
+    target = datetime(*now.timetuple()[0:3], hour=16, minute=11)
+
+    if target < now:  # if the target is before now, add one day
+        target += datetime.timedelta(days=1)
+
+    diff = target - now
+    await asyncio.sleep(diff.seconds)
+    await client.wait_until_ready()
+    print("Finished waiting")
+
+command_quote.start()
 
 
 client.run(token)
