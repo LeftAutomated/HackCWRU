@@ -81,17 +81,13 @@ async def hotlines_command(ctx):
     
 @client.command()
 async def links(ctx):
-  messageLinks = discord.Embed(title="Psych Central", url="https://psychcentral.com/", description="Psych Central is one of the oldest websites about mental health. The award winning website has been around ever since 1995 and has touched the lives of many. As is quite evident from the name the blog keenly focuses on the psych of a person.", color=0xFFA500)
-  messageLinks2 = discord.Embed(title="Headspace", url="https://www.headspace.com/", description="If you are finding it hard to focus on your life-goals all because you are stressed, then you should definitely check Headspace out. It contains hundreds of articles and blogs about mental health.", color=0xFFFFFF)
-  messageLinks3 = discord.Embed(title="Therapy Tribe", url="https://support.therapytribe.com/", description="Therapy Tribe takes peer-to-peer mental health support to the next level. Apart from a range of resources, it offers dedicated domains or Tribes for many different issues.", color=0xBF40BF)
-  messageLinks4 = discord.Embed(title="Calm Sage", url="https://www.calmsage.com/", description="If you like the idea of sharing your personal stories and discovering people with the same experiences, try out Calm Sage. The website is more educational than a place to connect, but it does welcome guest posts about mental health triumphs.", color=0xFFFF00)
-  messageLinks5 = discord.Embed(title="Doxy", url="https://www.calmsage.com/", description="doxy.me is a free, secure, simple online platform for telemedicine. Telemedicine will change the world by making it easier and more affordable for healthcare providers to care for their patients anywhere, including rural and underserved areas. We believe everyone should have access to care through telemedicine.", color=0xADD8E6)
-  await ctx.send("**We recommend the following links to help with sadness, anxiety, depression or any sort of negativity:**")
-  await ctx.send(embed = messageLinks)
-  await ctx.send(embed = messageLinks2)
-  await ctx.send(embed = messageLinks3)
-  await ctx.send(embed = messageLinks4)
-  await ctx.send(embed = messageLinks5)    
+  embed_titles = ["Psych Central", "Headspace", "Therapy Tribe", "Calm Sage", "Doxy"]
+  embed_urls = ["https://psychcentral.com/", "https://www.headspace.com/", "https://support.therapytribe.com/", "https://www.calmsage.com/", "https://www.doxy.me/"]
+  embed_descriptions = ["Psych Central is one of the oldest websites about mental health. The award winning website has been around ever since 1995 and has touched the lives of many. As is quite evident from the name the blog keenly focuses on the psych of a person.", "If you are finding it hard to focus on your life-goals all because you are stressed, then you should definitely check Headspace out. It contains hundreds of articles and blogs about mental health.", "Therapy Tribe takes peer-to-peer mental health support to the next level. Apart from a range of resources, it offers dedicated domains or Tribes for many different issues.", "If you like the idea of sharing your personal stories and discovering people with the same experiences, try out Calm Sage. The website is more educational than a place to connect, but it does welcome guest posts about mental health triumphs.", "doxy.me is a free, secure, simple online platform for telemedicine. Telemedicine will change the world by making it easier and more affordable for healthcare providers to care for their patients anywhere, including rural and underserved areas. We believe everyone should have access to care through telemedicine."]
+  embed_colors = [0xFFA500, 0xFFFFFF, 0xBF40BF, 0xFFFF00, 0xADD8E6]
+  for i in range (5): 
+    messageLinks = discord.Embed(title=embed_titles[i],url=embed_urls[i],description = embed_descriptions[i], color = embed_colors[i])
+    await ctx.send(embed = messageLinks)
 
 ################
 # joke command #
