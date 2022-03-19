@@ -25,6 +25,25 @@ async def on_ready():
 async def on_message(message):
     await client.process_commands(message)
 
+
+###################
+# therapy command #
+###################
+
+@client.command('therapy')
+async def therapy_command(ctx):
+    location_question = "Well hello there! I can help you seek therapy around your physical location. May I please know your city and state? **Format:**  $location Cleveland, OH" 
+
+    await ctx.author.send(location_question)
+
+    msg = await client.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.author.dm_channel, timeout=60)
+
+    user_location_response = msg.content
+
+    # todo
+    # recommend nearby therapy locations
+
+
 #################
 # quote command #
 #################
