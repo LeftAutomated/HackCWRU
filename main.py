@@ -5,13 +5,17 @@ import os
 import random
 from dotenv import load_dotenv
 from jokeapi import Jokes
+import dbms
+import functions
 
 load_dotenv()
 
 token = os.getenv('TOKEN')
 prefix = os.getenv('PREFIX')
 
-client = commands.Bot(command_prefix = prefix)
+intents = discord.Intents.default()
+intents.members = True
+client = commands.Bot(command_prefix=prefix, intents=intents)
 
 ##########
 # events #
@@ -27,7 +31,11 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
-    await member.send("Hello there! I'm SenPy. I'm your potential guide to happiness and a savior from sadness. If you'd like me to monitor your happiness levels, reply with a 'Yes'. Otherwise, reply with a 'No'.")
+    await member.send(f"Hello there {member}! I'm SenPy. I'm your potential guide to happiness and a savior from sadness. If you'd like me to monitor your happiness levels, reply with a 'Yes'. Otherwise, reply with a 'No'.")
+    msg = await client.wait_for('message', check=lambda m: m.author == member and  m.channel == member.dm_channel, timeout=60)
+    if (msg.content.strip() == "Yes"):
+        dbms.userInsert(member.id, 0, 0)
+        await member.send("Your messages will now be monitored!")
 
 #################
 # quote command #
@@ -122,6 +130,20 @@ async def meme_command(ctx):
     r = r.json()
     image_url = r["url"]
     await ctx.send(image_url)
+
+
+#####################
+# debugging command #
+#####################
+
+@client.command('printUsers')
+async def print_command(ctx):
+    for i in dbms.userView():
+        await ctx.send(i)
+
+@client.command('searchUser')
+async def search_command(ctx, discordId):
+    await ctx.send(functions.checkUserExist(discordId))
 
 
 client.run(token)
