@@ -13,6 +13,10 @@ prefix = os.getenv('PREFIX')
 
 client = commands.Bot(command_prefix = prefix)
 
+##########
+# events #
+##########
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -21,45 +25,60 @@ async def on_ready():
 async def on_message(message):
     await client.process_commands(message)
 
-@client.command()
-async def yomom(ctx):
-    response = requests.get('https://api.yomomma.info/')
-    joke = response.json()
-    await ctx.send(joke['joke'])
+#################
+# quote command #
+#################
 
-@client.command()
-async def yodad(ctx):
-    response = requests.get('https://api.yomomma.info/')
-    joke = response.json()
-    dadjoke = joke['joke'].replace("mamma", "dadda")
-    dadjoke = dadjoke.replace("her", "his")
-    dadjoke = dadjoke.replace("she", "he")
-    await ctx.send(dadjoke)
-
-@client.command()
-async def quote(ctx):
+@client.command('quote')
+async def quote_command(ctx):
     response = requests.get("https://type.fit/api/quotes")
     quote_arr = response.json()
     rand = random.randint(0, len(quote_arr))
     quote = quote_arr[rand]['text'] + " \n- " + quote_arr[rand]['author']
     await ctx.send(quote)
 
-def create_embed(title, url, description):
-    return discord.Embed(title=title, url=url, description=description, color=0xFF5733)
 
-# Command invoked with !hotline
-@client.command("hotline")
-async def command_hotlines(ctx):
-    hotlines = {
-        "SAMSHA National Helpline": "1-800-662-4357",
-        "NAMI": "1-800-950-6264",
-        "National Suicide Prevention Hotline": "1-800-273-8255",
-        "Boys Town Hotline": "1-800-448-3000"
-    }
-    hotline_message = "**Here are several mental health hotlines to call:** \n\n"
-    for name, number in hotlines:
-        hotline_message += hotline + '\n'
-    await ctx.send(hotline_message)
+####################
+# hotlines command #
+####################
+
+hotline_names = ["SAMSHA National Helpline", 
+                 "NAMI", 
+                 "National Suicide Prevention Hotline", 
+                 "Boys Town Hotline"]
+hotline_links = ["https://www.samhsa.gov/find-help/national-helpline", 
+                 "https://www.nami.org/help", 
+                 "https://suicidepreventionlifeline.org/", 
+                 "https://www.boystown.org/hotline/Pages/default.aspx"]
+hotline_numbers = ["1-800-662-4357", 
+                   "1-800-950-6264",
+                   "1-800-273-8255",
+                   "1-800-448-3000"]
+
+@client.command('hotlines')
+async def hotlines_command(ctx):
+    embed = discord.Embed()
+
+    title = "Hotlines"
+    desc = ""
+    color = discord.Color.blue();
+
+    for i in range(len(hotline_names)):
+        desc += hotline_numbers[i] + " -- "
+        desc += "[" + hotline_names[i] + "]"
+        desc += "(" + hotline_links[i] + ")"
+        desc += "\n"
+
+    embed.title = title
+    embed.description = desc
+    embed.color = color
+
+    await ctx.send(embed=embed)
+
+
+################
+# joke command #
+################
 
 @client.command('joke')
 async def joke_command(ctx):
@@ -74,8 +93,13 @@ async def joke_command(ctx):
 
     await ctx.send(joke_message)
 
+
+################
+# meme command #
+################
+
 @client.command('meme')
-async def command_meme(ctx):
+async def meme_command(ctx):
     base_url = "https://meme-api.herokuapp.com/gimme"
     r = requests.get(base_url)
     r = r.json()
