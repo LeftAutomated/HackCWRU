@@ -17,7 +17,8 @@ prefix = os.getenv('PREFIX')
 
 intents = discord.Intents.default()
 intents.members = True
-client = commands.Bot(command_prefix=prefix, intents=intents)
+
+client = commands.Bot(command_prefix = prefix, intents=intents)
 
 ##########
 # events #
@@ -56,9 +57,11 @@ async def therapy_command(ctx):
     msg = await client.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.author.dm_channel, timeout=60)
 
     user_location_response = msg.content
+    city, state = msg.content.split(", ")
+    therapists_url = f"https://www.goodtherapy.org/therapists/{state}/{city}"
+    await ctx.author.send("Here are some therapists in your area: \n" + therapists_url)
 
-    # todo
-    # recommend nearby therapy locations
+# canny command #
 
 #################
 # quote command #
@@ -114,14 +117,31 @@ async def hotlines_command(ctx):
 # Links command #
 #################
 
+embed_titles = ["Psych Central",
+                  "Headspace", 
+                  "Therapy Tribe",
+                  "Calm Sage", 
+                  "Doxy"]
+embed_urls = ["https://psychcentral.com/", 
+                "https://www.headspace.com/", 
+                "https://support.therapytribe.com/", 
+                "https://www.calmsage.com/", 
+                "https://www.doxy.me/"]
+embed_descriptions = ["Psych Central is one of the oldest websites about mental health. The award winning website has been around ever since 1995 and has touched the lives of many. As is quite evident from the name the blog keenly focuses on the psych of a person.", 
+                      "If you are finding it hard to focus on your life-goals all because you are stressed, then you should definitely check Headspace out. It contains hundreds of articles and blogs about mental health.", 
+                      "Therapy Tribe takes peer-to-peer mental health support to the next level. Apart from a range of resources, it offers dedicated domains or Tribes for many different issues.", 
+                      "If you like the idea of sharing your personal stories and discovering people with the same experiences, try out Calm Sage. The website is more educational than a place to connect, but it does welcome guest posts about mental health triumphs.", 
+                      "doxy.me is a free, secure, simple online platform for telemedicine. Telemedicine will change the world by making it easier and more affordable for healthcare providers to care for their patients anywhere, including rural and underserved areas. We believe everyone should have access to care through telemedicine."]
+embed_colors = [0xFFA500, 
+                0xFFFFFF, 
+                0xBF40BF, 
+                0xFFFF00, 
+                0xADD8E6]
+
 @client.command()
 async def links(ctx):
-  embed_titles = ["Psych Central", "Headspace", "Therapy Tribe", "Calm Sage", "Doxy"]
-  embed_urls = ["https://psychcentral.com/", "https://www.headspace.com/", "https://support.therapytribe.com/", "https://www.calmsage.com/", "https://www.doxy.me/"]
-  embed_descriptions = ["Psych Central is one of the oldest websites about mental health. The award winning website has been around ever since 1995 and has touched the lives of many. As is quite evident from the name the blog keenly focuses on the psych of a person.", "If you are finding it hard to focus on your life-goals all because you are stressed, then you should definitely check Headspace out. It contains hundreds of articles and blogs about mental health.", "Therapy Tribe takes peer-to-peer mental health support to the next level. Apart from a range of resources, it offers dedicated domains or Tribes for many different issues.", "If you like the idea of sharing your personal stories and discovering people with the same experiences, try out Calm Sage. The website is more educational than a place to connect, but it does welcome guest posts about mental health triumphs.", "doxy.me is a free, secure, simple online platform for telemedicine. Telemedicine will change the world by making it easier and more affordable for healthcare providers to care for their patients anywhere, including rural and underserved areas. We believe everyone should have access to care through telemedicine."]
-  embed_colors = [0xFFA500, 0xFFFFFF, 0xBF40BF, 0xFFFF00, 0xADD8E6]
-  for i in range (5):
-    messageLinks = discord.Embed(title=embed_titles[i],url=embed_urls[i],description = embed_descriptions[i], color = embed_colors[i])
+    for i in range (5):
+        messageLinks = discord.Embed(title=embed_titles[i],url=embed_urls[i],description = embed_descriptions[i], color = embed_colors[i])
     await ctx.send(embed = messageLinks)
 
 ################
@@ -133,7 +153,7 @@ async def joke_command(ctx):
     j = await Jokes()
     joke = await j.get_joke(blacklist=['nsfw', 'racist', 'sexist', 'religious'])
     joke_message = ""
-    if joke["type"] == "single": # Print the joke
+    if joke["type"] == "single": 
         joke_message += joke["joke"]
     else:
         joke_message += joke["setup"]
@@ -153,7 +173,7 @@ async def meme_command(ctx):
     image_url = r["url"]
     await ctx.send(image_url)
 
-@tasks.loop(seconds=10)
+@tasks.loop(hours=24)
 async def command_quote():
     channel = client.get_channel(954837807187247255)
     r = requests.get("https://zenquotes.io/api/random").json()
@@ -179,7 +199,7 @@ async def before():
     now = datetime.now()
     target = datetime(*now.timetuple()[0:3], hour=16, minute=11)
 
-    if target < now:  # if the target is before now, add one day
+    if target < now:  
         target += datetime.timedelta(days=1)
 
     diff = target - now
@@ -187,7 +207,7 @@ async def before():
     await client.wait_until_ready()
     print("Finished waiting")
 
-command_quote.start()
 
+command_quote.start()
 
 client.run(token)
