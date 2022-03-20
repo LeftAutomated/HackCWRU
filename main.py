@@ -36,6 +36,16 @@ async def on_message(message):
     await client.process_commands(message)
     if functions.checkUserExist(message.author.id):
         functions.checkWordExist(message.author.id, message.content)
+    # Check mood of user and send DM accordingly
+    user = message.author
+    if not dbms.userSearch(user.id):
+        pass
+    elif dbms.userSearch(user.id)[0][2] > 15:
+        # Positive message
+        await send_user_status_update(user.id)
+    elif dbms.userSearch(user.id)[0][3] > 15:
+        # Negative message
+        await send_user_status_update(user.id, positive=False)
 
 @client.event
 async def on_member_join(member):
@@ -272,6 +282,19 @@ async def helpMee(ctx):
   for i in range (len(senpy_cmds)):
     messageCommands = discord.Embed(title="!"+senpy_cmds[i],url="",description=senpy_description[i],color= 0xFFFFFF)
     await ctx.send(embed = messageCommands)  
+
+async def send_user_status_update(discordId, positive=True):
+    user = client.get_user(discordId)
+    if positive:
+        # Positive message
+        message = "Congratulations! Your SenPy score has reached 15."
+    else:
+        # Negative message
+        message = "Oh no! Your SenPy score has dropped below -15."
+    await user.send(message)
+
+
+
 
 command_quote.start()
 
