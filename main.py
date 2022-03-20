@@ -172,7 +172,7 @@ embed_colors = [0xFFA500,
 async def links_command(ctx):
     for i in range (5):
         messageLinks = discord.Embed(title=embed_titles[i],url=embed_urls[i],description = embed_descriptions[i], color = embed_colors[i])
-    await ctx.send(embed = messageLinks)
+        await ctx.send(embed = messageLinks)
 
 ################
 # joke command #
