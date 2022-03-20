@@ -237,6 +237,41 @@ async def before():
     await client.wait_until_ready()
     print("Finished waiting")
 
+################
+# help command #
+################
+
+@client.command()
+async def helpMee(ctx):
+  senpy_cmd_dictionary = {
+    'help': 'Current Commmand.',
+    'quote': 'Pings you with happy & motivational quotes.',
+    'hotlines': 'Not feeling it? Emergency hotlines are always there to help you!',
+    'links': 'Seek online mental help using the mental health websites we recommend.',
+    'therapy': 'I will personally help you with seeking mental therapy around you.',
+    'joke': 'You know what this does haha! 😊',
+    'memes': 'You know what this does also 😜',
+    'canny': 'Become Mr. cannyble'
+  }
+  senpy_cmds = ['help',
+            'quote'
+            'hotlines',
+            'links',
+            'therapy',
+            'joke',
+            'memes',
+            'canny']
+  senpy_description = ['Current Commmand.',
+    'Pings you with happy & motivational quotes.',
+    'Not feeling it? Emergency hotlines are always there to help you!',
+    'Seek online mental help using the mental health websites we recommend.',
+    'I will personally help you with seeking mental therapy around you.',
+    'You know what this does haha! 😊',
+    'You know what this does also 😜',
+    'Become Mr. cannyble']
+  for i in range (len(senpy_cmds)):
+    messageCommands = discord.Embed(title="!"+senpy_cmds[i],url="",description=senpy_description[i],color= 0xFFFFFF)
+    await ctx.send(embed = messageCommands)  
 
 command_quote.start()
 
