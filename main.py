@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands, tasks
 import requests
 import os
+import io
 import random
 from dotenv import load_dotenv
 from jokeapi import Jokes
@@ -9,6 +10,7 @@ import dbms
 import functions
 from datetime import datetime, timedelta
 import asyncio
+from PIL import Image, ImageDraw, ImageSequence
 
 load_dotenv()
 
@@ -45,9 +47,10 @@ async def on_member_join(member):
 # therapy command #
 ###################
 
+location_question = "Well hello there! I can help you seek therapy around your physical location. May I please know your city and state? **Format:**  $location Cleveland, OH" 
+
 @client.command('therapy')
 async def therapy_command(ctx):
-    location_question = "Well hello there! I can help you seek therapy around your physical location. May I please know your city and state? **Format:**  $location Cleveland, OH" 
 
     await ctx.author.send(location_question)
 
@@ -58,7 +61,34 @@ async def therapy_command(ctx):
     # todo
     # recommend nearby therapy locations
 
+
+#################
 # canny command #
+#################
+
+file_path = './assets/canny.gif'
+canny_gif = Image.open(file_path)
+
+@client.command('canny')
+async def canny_command(ctx):
+    url = ctx.author.avatar_url
+
+    pfp_path = './assets/pfp.png'
+
+    pfp = Image.open(requests.get(url, stream=True).raw)
+
+    pfp.save(pfp_path, 'PNG')
+
+    with open(pfp_path, 'rb') as f:
+        pic = discord.File(f)
+        await ctx.send(file=pic)
+
+    with open(file_path, 'rb') as f:
+        gif = discord.File(f)
+        await ctx.send(file=gif)
+    
+
+
 
 #################
 # quote command #
@@ -135,8 +165,8 @@ embed_colors = [0xFFA500,
                 0xFFFF00, 
                 0xADD8E6]
 
-@client.command()
-async def links(ctx):
+@client.command('links')
+async def links_command(ctx):
     for i in range (5):
         messageLinks = discord.Embed(title=embed_titles[i],url=embed_urls[i],description = embed_descriptions[i], color = embed_colors[i])
     await ctx.send(embed = messageLinks)
