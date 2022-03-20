@@ -54,9 +54,9 @@ async def therapy_command(ctx):
     msg = await client.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.author.dm_channel, timeout=60)
 
     user_location_response = msg.content
-
-    # todo
-    # recommend nearby therapy locations
+    city, state = msg.content.split(", ")
+    therapists_url = f"https://www.goodtherapy.org/therapists/{state}/{city}"
+    await ctx.author.send("Here are some therapists in your area: \n" + therapists_url)
 
 # canny command #
 
@@ -170,7 +170,7 @@ async def meme_command(ctx):
     image_url = r["url"]
     await ctx.send(image_url)
 
-@tasks.loop(seconds=10)
+@tasks.loop(hours=24)
 async def command_quote():
     channel = client.get_channel(954837807187247255)
     r = requests.get("https://zenquotes.io/api/random").json()
