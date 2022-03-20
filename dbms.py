@@ -38,17 +38,34 @@ def userDelete(discordId):
     conn.commit()
     conn.close()
 
-def userUpdate(discordId, happy, sad):
+def userUpdateHappy(discordId, happy):
     conn = sqlite3.connect("databases/user.db")
     cur = conn.cursor()
-    cur.execute("UPDATE user SET happy=?,sad=? WHERE discordId=?",(happy, sad, discordId))
+    cur.execute("UPDATE user SET happy=? WHERE discordId=?",(happy, discordId,))
+    conn.commit()
+    conn.close()
+
+def userUpdateSad(discordId, sad):
+    conn = sqlite3.connect("databases/user.db")
+    cur = conn.cursor()
+    cur.execute("UPDATE user SET sad=? WHERE discordId=?",(sad, discordId,))
     conn.commit()
     conn.close()
 
 
 # Words database functions
-def wordConnect():
-    words_conn = sqlite3.connect("databases/words.db")
-    words_cur = words_conn.cursor()
-    conn.commit()
+def wordSearchPositive(word):
+    conn = sqlite3.connect("databases/words.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM positive WHERE word=?",(word,))
+    rows = cur.fetchall()
     conn.close()
+    return rows
+
+def wordSearchNegative(word):
+    conn = sqlite3.connect("databases/words.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM negative WHERE word=?",(word,))
+    rows = cur.fetchall()
+    conn.close()
+    return rows

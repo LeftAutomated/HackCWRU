@@ -29,10 +29,13 @@ client = commands.Bot(command_prefix = prefix, intents=intents)
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+    dbms.userConnect()
 
 @client.event
 async def on_message(message):
     await client.process_commands(message)
+    if functions.checkUserExist(message.author.id):
+        functions.checkWordExist(message.author.id, message.content)
 
 @client.event
 async def on_member_join(member):
@@ -57,9 +60,9 @@ async def therapy_command(ctx):
     msg = await client.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.author.dm_channel, timeout=60)
 
     user_location_response = msg.content
-
-    # todo
-    # recommend nearby therapy locations
+    city, state = msg.content.split(", ")
+    therapists_url = f"https://www.goodtherapy.org/therapists/{state}/{city}"
+    await ctx.author.send("Here are some therapists in your area: \n" + therapists_url)
 
 
 #################
@@ -200,7 +203,7 @@ async def meme_command(ctx):
     image_url = r["url"]
     await ctx.send(image_url)
 
-@tasks.loop(seconds=10)
+@tasks.loop(hours=24)
 async def command_quote():
     channel = client.get_channel(954837807187247255)
     r = requests.get("https://zenquotes.io/api/random").json()
@@ -220,7 +223,6 @@ async def print_command(ctx):
 @client.command('searchUser')
 async def search_command(ctx, discordId):
     await ctx.send(functions.checkUserExist(discordId))
-
 
 @command_quote.before_loop
 async def before():
